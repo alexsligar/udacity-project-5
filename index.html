@@ -13,6 +13,12 @@
     <body>
         <div class="container">
             <h1>Star Notary</h1>
+            <p>Search a star:</p>
+
+            <div class="row">
+                <label class="bold">Star TokenID:</label>
+                <label id="star-token-id"></label>
+            </div>
 
             <div class="row">
                 <label class="bold">Star Name:</label>
@@ -25,18 +31,67 @@
             </div>
 
             <div class="row">
+                <label class="bold">Star Dec:</label>
+                <label id="star-dec"></label>
+            </div>
+
+            <div class="row">
+                <label class="bold">Star Mag:</label>
+                <label id="star-mag"></label>
+            </div>
+
+            <div class="row">
+                <label class="bold">Star Cent:</label>
+                <label id="star-cent"></label>
+            </div>
+
+            <div class="row">
                 <label class="bold">Star TokenID</label>
-                <input id="star_token_id" type="text" />
+                <input id="star-token-id-input" type="text" />
                 <button onClick="getStarByIdButtonClicked()">Look Up Star</button>
             </div>
 
             <br />
+            <hr/>
+
+            <p>Claim a star:</p>
+            <div class="row">
+                <label class="bold">TokenID</label>
+                <input id="token-id-input" type="text" />
+            </div>
+
+            <div class="row">
+                <label class="bold">Name</label>
+                <input id="name-input" type="text" />
+            </div>
+
+            <div class="row">
+                <label class="bold">Story</label>
+                <input id="story-input" type="text" />
+            </div>
+
+            <div class="row">
+                <label class="bold">Dec</label>
+                <input id="dec-input" type="text" />
+            </div>
+
+            <div class="row">
+                <label class="bold">Mag</label>
+                <input id="mag-input" type="text" />
+            </div>
+
+            <div class="row">
+                <label class="bold">Cent</label>
+                <input id="cent-input" type="text" />
+            </div>
+
+            <div class="row">
+                <label id="star-added" style="color: red;"></label>
+            </div>
 
             <div class="row">
                 <button onClick="createStarClicked()">Claim Star</button>
             </div>
-
-            <p>Fun</p>
 
         </div>
 
@@ -56,23 +111,23 @@
                     starNotaryAbi
                 );
                 // Grab the contract at specified deployed address with the interface defined by the ABI
-                var starNotary = StarNotary.at('0x01EBc219b63243Bed773CC021Dc36B2a5AB5DCEa');
+                var starNotary = StarNotary.at('0xfDBEd1EE199ddE8Db6873D84da541Fc34aA60a1d');
 
                 function getStarByIdButtonClicked() {
-                    web3.eth.getAccounts(function(error, accounts) {
-                        if (error) {
+                    var starId = document.getElementById('star-token-id-input').value;
+                    starNotary.tokenIdToStarInfo(starId, function(error, result) {
+                        if(error) {
                             console.log(error);
-                            return;
+                        } else {
+                            document.getElementById('star-token-id').innerText = starId;
+                            document.getElementById('star-name').innerText = result[0];
+                            document.getElementById('star-story').innerText = result[1];
+                            document.getElementById('star-dec').innerText = result[2];
+                            document.getElementById('star-mag').innerText = result[3];
+                            document.getElementById('star-cent').innerText = result[4];
+                            document.getElementById('star-token-id-input').value = "";
                         }
-                        var account = accounts[0];
-                        var starId = document.getElementById('star_token_id').value;
-                        starNotary.tokenIdToStarInfo(1, {from: accounts[0]}, function(error, star) {
-                            if (error) {
-                                console.log(error);
-                            }
-                            console.log(star);
-                        });
-                    });
+                    })
                 }
 
                 function createStarClicked() {
@@ -82,16 +137,31 @@
                             return;
                         }
                         var account = accounts[0];
-                        var starName = "Star power 103!";
-                        var starStory = "I love my wonderful star";
-                        var starRa = "ra_032.155";
-                        var starDec = "dec_121.874";
-                        var starMag = "mag_245.978";
-                        starNotary.createStar(starName, starStory, starRa, starDec, starMag, 1, {from: account}, function(error, result) {
+                        var tokenId = document.getElementById('token-id-input').value;
+                        var starName = document.getElementById('name-input').value;
+                        var starStory = document.getElementById('story-input').value;
+                        var starDec = document.getElementById('dec-input').value;
+                        var starMag = document.getElementById('mag-input').value;
+                        var starCent = document.getElementById('cent-input').value;
+                        starNotary.createStar(starName, starStory, starDec, starMag, starCent, tokenId, {from: account}, function(error, result) {
                             if (error) {
                                 console.log(error);
+                                return;
                             }
-                            console.log(result);
+                            var starCreatedEvent = starNotary.Transfer({to: account});
+                            starCreatedEvent.watch(function(error, result) {
+                                if (error) {
+                                    console.log(error);
+                                } else {
+                                    document.getElementById('token-id-input').value = "";
+                                    document.getElementById('name-input').value = "";
+                                    document.getElementById('story-input').value = "";
+                                    document.getElementById('dec-input').value = "";
+                                    document.getElementById('mag-input').value = "";
+                                    document.getElementById('cent-input').value = "";
+                                    document.getElementById('star-added').innerText = "Star with tokenId: " + result.args.tokenId.c[0] + " claimed.";
+                                }
+                            })
                         });
                     })
                 }
