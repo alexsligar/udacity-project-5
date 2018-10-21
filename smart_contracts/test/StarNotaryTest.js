@@ -8,7 +8,7 @@ contract('StarNotary', accounts => {
     
     describe('can create a star', () => { 
 
-        let star = ['Star Power 103!', "I love my wonderful star", "ra_032.155", "dec_121.874", "mag_245.978"];
+        let star = ['Star Power 103!', "I love my wonderful star", "dec_032.155", "mag_121.874", "cent_245.978"];
 
         beforeEach(async function () { 
             await this.contract.createStar(...star, 1, {from: accounts[0]})    
@@ -38,7 +38,7 @@ contract('StarNotary', accounts => {
 
         it('can create two different stars', async function() {
 
-            let secondStar = ['Awesome star', 'Found it online', 'ra_032.155', 'dec_121.874', 'mag_245.979'];
+            let secondStar = ['Awesome star', 'Found it online', 'dec_032.155', 'mag_121.874', 'cent_245.979'];
             await this.contract.createStar(...secondStar, 2, {from: accounts[0]});
             const res = await this.contract.tokenIdToStarInfo(2);
             assert.deepEqual(res, secondStar);
@@ -46,7 +46,7 @@ contract('StarNotary', accounts => {
 
         it('cannot create two stars with same tokenId', async function() {
 
-            let secondStar = ['Awesome star', 'Found it online', 'ra_032.155', 'dec_121.874', 'mag_245.979'];
+            let secondStar = ['Awesome star', 'Found it online', 'dec_032.155', 'mag_121.874', 'cent_245.979'];
 
             try {
                 await this.contract.createStar(...secondStar, 1, {from: accounts[1]});
@@ -63,7 +63,7 @@ contract('StarNotary', accounts => {
         let user2 = accounts[2]
         let randomMaliciousUser = accounts[3]
         
-        let star = ['Star Power 103!', "I love my wonderful star", "ra_032.155", "dec_121.874", "mag_245.978"];
+        let star = ['Star Power 103!', "I love my wonderful star", "dec_032.155", "mag_121.874", "cent_245.978"];
         let starId = 1
         let starPrice = web3.toWei(.01, "ether")
 
@@ -136,7 +136,7 @@ contract('StarNotary', accounts => {
 
     describe('checkIfStarExist distinguishes whether a star coordinates exist', () => { 
 
-        let star = ['Star Power 103!', "I love my wonderful star", "ra_032.155", "dec_121.874", "mag_245.978"];
+        let star = ['Star Power 103!', "I love my wonderful star", "dec_032.155", "mag_121.874", "cent_245.978"];
 
         it('should return true when a stars coordinates have been used', async function () { 
             
@@ -152,7 +152,7 @@ contract('StarNotary', accounts => {
 
     describe('approving and transfering tokens', () => {
 
-        let star = ['Star Power 103!', "I love my wonderful star", "ra_032.155", "dec_121.874", "mag_245.978"];
+        let star = ['Star Power 103!', "I love my wonderful star", "dec_032.155", "mag_121.874", "cent_245.978"];
 
         it('should correctly approve the address and return the approve address', async function() {
 

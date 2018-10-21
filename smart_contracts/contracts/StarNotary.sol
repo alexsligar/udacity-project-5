@@ -7,24 +7,24 @@ contract StarNotary is ERC721 {
     struct Star { 
         string name;
         string story;
-        string ra;
         string dec;
         string mag;
+        string cent;
     }
 
     mapping(uint256 => Star) public tokenIdToStarInfo; 
     mapping(uint256 => uint256) public starsForSale;
     mapping(bytes32 => uint) public starHashMarker;
 
-    function createStar(string _name, string _story, string _ra, string _dec, string _mag, uint256 _tokenId) public {
-        require(!(checkIfStarExist(_ra, _dec, _mag)), "this star has already been registered");
-        Star memory newStar = Star(_name, _story, _ra, _dec, _mag);
+    function createStar(string _name, string _story, string _dec, string _mag, string _cent, uint256 _tokenId) public {
+        require(!(checkIfStarExist(_dec, _mag, _cent)), "this star has already been registered");
+        Star memory newStar = Star(_name, _story, _dec, _mag, _cent);
 
         tokenIdToStarInfo[_tokenId] = newStar;
 
         _mint(msg.sender, _tokenId);
 
-        bytes32 starCoordinates = keccak256(abi.encodePacked(_ra, _dec, _mag));
+        bytes32 starCoordinates = keccak256(abi.encodePacked(_dec, _mag, _cent));
         starHashMarker[starCoordinates] = 1;
     }
 
@@ -51,8 +51,8 @@ contract StarNotary is ERC721 {
         }
     }
 
-    function checkIfStarExist(string _ra, string _dec, string _mag) public view returns(bool) {
-        bytes32 starCoordinates = keccak256(abi.encodePacked(_ra, _dec, _mag));
+    function checkIfStarExist(string _dec, string _mag, string _cent) public view returns(bool) {
+        bytes32 starCoordinates = keccak256(abi.encodePacked(_dec, _mag, _cent));
         return (starHashMarker[starCoordinates] != 0);
     }
 }
